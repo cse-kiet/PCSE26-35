@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2026-05-01 16:28:22.936264 by Eclipse SUMO randomTrips.py v1.26.0
+<configuration>
+    <net-file value="/home/ghanatava/PCSE26-35/src/sumo/intersection.net.xml"/>
+    <route-file value="/home/ghanatava/PCSE26-35/src/sumo/intersection.rou.xml"/>
+    <fringe-factor value="10"/>
+    <min-distance value="100.0"/>
+    <end value="100.0"/>
+    <period value="5.0"/>
+</configuration>
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <trip id="0" depart="0.00" from="sn" to="ew"/>
+    <trip id="1" depart="5.00" from="no" to="ew"/>
+    <trip id="2" depart="10.00" from="sn" to="oe"/>
+    <trip id="3" depart="15.00" from="we" to="ew"/>
+    <trip id="4" depart="20.00" from="no" to="ew"/>
+    <trip id="5" depart="25.00" from="eo" to="oe"/>
+    <trip id="6" depart="30.00" from="sn" to="oe"/>
+    <trip id="7" depart="35.00" from="eo" to="oe"/>
+    <trip id="8" depart="40.00" from="we" to="ew"/>
+    <trip id="9" depart="45.00" from="no" to="ew"/>
+    <trip id="10" depart="50.00" from="we" to="ns"/>
+    <trip id="11" depart="55.00" from="no" to="oe"/>
+    <trip id="12" depart="60.00" from="sn" to="ew"/>
+    <trip id="13" depart="65.00" from="eo" to="ns"/>
+    <trip id="14" depart="70.00" from="eo" to="ns"/>
+    <trip id="15" depart="75.00" from="sn" to="ns"/>
+    <trip id="16" depart="80.00" from="no" to="ew"/>
+    <trip id="17" depart="85.00" from="no" to="on"/>
+    <trip id="18" depart="90.00" from="sn" to="oe"/>
+    <trip id="19" depart="95.00" from="eo" to="oe"/>
+</routes>

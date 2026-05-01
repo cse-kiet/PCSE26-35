@@ -1,26 +1,27 @@
 # V2V Computation Offloading Simulation
 
-> A comparative study of five heuristic Vehicle-to-Vehicle (V2V) computation offloading strategies for autonomous vehicle networks, simulated at an urban intersection in MATLAB.
+> A comparative study of five heuristic Vehicle-to-Vehicle (V2V) computation offloading strategies for autonomous vehicle networks, simulated at an urban intersection in MATLAB — upgraded with realistic SUMO mobility traces.
 
 ---
 
-## 📄 Paper
+## Paper
 
-**Title:** A Comparative Study of Multi-Heuristic V2V Computation Offloading Strategies for Autonomous Vehicle Networks  
-**Conference:** ICCISD-2026, Sharda University  
-**Paper ID:** 527  
-**Authors:** Ghanatava Vashu Thakaran, Ayush Agrawal, Sarvagya Pradhan, Kshitiz Agarwal, Gaurav Parashar  
+**Title:** A Comparative Study of Multi-Heuristic V2V Computation Offloading Strategies for Autonomous Vehicle Networks
+**Conference:** ICCISD-2026, Sharda University
+**Paper ID:** 527
+**Authors:** Ghanatava Vashu Thakaran, Ayush Agrawal, Sarvagya Pradhan, Kshitiz Agarwal, Gaurav Parashar
 **Institution:** Department of Computer Science and Engineering, KIET Group of Institutions, Ghaziabad, India
 
 ---
 
-## 📖 Description
+## Description
 
-Autonomous vehicles generate large volumes of latency-sensitive tasks — object detection, path planning, collision avoidance — that cannot always be processed locally, especially on lower-cost hardware. This project investigates **Vehicle-to-Vehicle (V2V) computation offloading** as an infrastructure-free alternative to the dominant Vehicle-to-Infrastructure (V2I) model.
+Autonomous vehicles generate large volumes of latency-sensitive tasks — object detection, path planning, collision avoidance — that cannot always be processed locally. This project investigates **Vehicle-to-Vehicle (V2V) computation offloading** as an infrastructure-free alternative to Vehicle-to-Infrastructure (V2I) models.
 
-Rather than sending tasks to roadside units or cloud servers, vehicles offload computation directly to nearby vehicles with spare processing capacity. This approach reduces dependence on RSU coverage while achieving low latency through physical proximity.
+The project implements and compares **five heuristic offloading strategies** across two simulation tiers:
 
-The project implements and compares **five heuristic offloading strategies** under a unified MATLAB simulation of four autonomous vehicles converging at a signalised urban intersection:
+- **Baseline** — 4 vehicles, fixed positions, linear link quality model
+- **SUMO-upgraded** — 20 vehicles, realistic mobility from SUMO, IEEE 802.11p channel model, statistical evaluation, stress testing
 
 | Strategy | Core Idea |
 |---|---|
@@ -30,7 +31,7 @@ The project implements and compares **five heuristic offloading strategies** und
 | **Game-Theoretic** | Maximise a utility function balancing delay savings vs energy cost |
 | **Load-Balancing** | Pick the neighbour with the shortest current task queue |
 
-### Key Results
+### Key Results (Baseline — 4 vehicles)
 
 | Strategy | Completion Rate | Offloading Rate |
 |---|---|---|
@@ -40,31 +41,54 @@ The project implements and compares **five heuristic offloading strategies** und
 | Game-Theoretic | **1.0000** | 0.0181 |
 | Load-Balancing | **1.0000** | **0.6290** |
 
-**Finding:** Game-Theoretic and Load-Balancing both achieve perfect task completion. Load-Balancing additionally maintains a high offloading rate (62.9%), making it the best overall strategy. Greedy achieves the highest throughput but is most vulnerable to mobility-induced deadline misses.
-
 ---
 
-## 🗂️ Repository Structure
+## Repository Structure
 
 ```
 project/
-├── intersection3.m              
-├── intersection-multipolicy.m            
-├── multipolicy-comparitive-simulation.m  
-├── Instruction to run.txt      
-└── README.md                   
+├── Makefile                              # Automates SUMO + MATLAB pipeline
+├── intersection3.m                       # Baseline: single-policy Greedy
+├── intersection-multiploicy.m            # Baseline: five-policy comparison
+├── multipolicy-comparative-simulation.m  # Baseline: detailed comparison
+├── intersectionmultipolicy_sumo.m        # SUMO: single-run five-policy comparison
+├── run_trials.m                          # SUMO: 30-trial statistical evaluation
+├── stress_test.m                         # SUMO: density + load sweep
+├── src/
+│   ├── parse_fcd.m                       # Load SUMO CSV into vehicle structs
+│   ├── get_vehicle_state.m               # Query vehicle position at time t
+│   ├── channel_model.m                   # IEEE 802.11p log-distance path loss
+│   ├── build_v2v_matrix.m                # Build NxN link quality matrix
+│   ├── generate_task_sumo.m              # Task generator for SUMO vehicles
+│   ├── run_sumo_sim.m                    # Shared simulation engine
+│   ├── greedy_policy.m                   # Policy implementations (updated signatures)
+│   ├── speedcheck_policy.m
+│   ├── threshold_policy.m
+│   ├── gametheoretic_policy.m
+│   ├── loadbalance_policy.m
+│   └── sumo/
+│       ├── intersection.nod.xml          # Road network nodes
+│       ├── intersection.edg.xml          # Road network edges
+│       ├── intersection.net.xml          # Compiled network (generated)
+│       ├── intersection.rou.xml          # Vehicle routes (generated)
+│       ├── intersection.sumocfg          # SUMO run configuration
+│       ├── generate_traces.py            # Run SUMO, export FCD to CSV
+│       ├── visualise_traces.py           # Plot trajectories, heatmap, speeds
+│       └── fcd_traces.csv                # Mobility traces output (generated)
 ```
 
 ---
 
-## ⚙️ Requirements
+## Requirements
 
 ### Software
 
 | Requirement | Version | Notes |
 |---|---|---|
 | MATLAB | R2022a or later | Any edition including Student |
-| MATLAB Toolboxes | None | Only built-in functions used |
+| SUMO | 1.8 or later | `sudo apt install sumo sumo-tools` |
+| Python | 3.8 or later | Standard library + matplotlib |
+| matplotlib | 3.5 or later | `pip install matplotlib` |
 
 ### Hardware
 
@@ -72,112 +96,126 @@ project/
 |---|---|---|
 | RAM | 4 GB | 8 GB |
 | CPU | Dual-core 2.0 GHz | Quad-core |
-| Disk | 50 MB | 100 MB |
+| Disk | 200 MB | 500 MB |
 | Display | Any | 1920×1080 for best figure rendering |
 
-### Operating System
-
-- Windows 10 / 11
-- macOS 12 (Monterey) or later
-- Ubuntu 20.04 or later
-- Any OS that supports MATLAB R2022a+
-
 ---
 
-## 🚀 Quick Start
+## Quick Start
+
+### Baseline (MATLAB only, no SUMO needed)
 
 ```matlab
-% 1. Set MATLAB working directory to the project folder
 cd('path/to/project')
-
-% 2. Run the five-policy comparison (main result)
-multipolicy-comparitive-simulation.m
-
-% 3. Run the single-policy greedy simulation
-intersection3.m
-
-% 4. Run the multipolicy-simulation with assumption of 100% task completion
-intersection-multipolicy.m
+intersectionmultipolicy_sumo   % or the original intersection-multiploicy.m
 ```
 
-For step-by-step setup instructions, expected outputs, parameter tuning, and troubleshooting, see [`Instruction to run.txt`](Instruction%20to%20run.txt).
+### SUMO-Upgraded (full pipeline)
+
+```bash
+# Step 1 — generate mobility traces
+make sumo
+
+# Step 2 — visualise vehicle movement (pick one)
+make sumo-gui          # live GUI playback (needs desktop)
+make visualise         # save PNG plots to src/sumo/
+
+# Step 3 — run MATLAB analysis
+make matlab-compare    # single run, policy table + bar chart
+make matlab-trials     # 30-trial mean ± std
+make matlab-stress     # density + load sweep plots
+```
 
 ---
 
-## 🔬 Simulation Details
+## Simulation Parameters
 
-### Environment
+### SUMO Trace Generation
 
-- **Road:** 500 m × 500 m grid, single intersection at (250, 250)
-- **Vehicles:** 4, approaching from East, West, North, South
-- **Traffic signal:** 4-phase cycle — 30 s GREEN / 5 s YELLOW per direction
-- **Duration:** 100 seconds, 0.1 s time step (1001 steps)
-
-### V2V Link Model
-
-Link quality between vehicles *i* and *j* is computed as:
-
-```
-Q(i,j) = max(0, 1 - distance(i,j) / 300)
-```
-
-Only links with Q ≥ 0.5 (vehicles within 150 m) are eligible for offloading.
-
-### Task Types
-
-| Type | Comp. Req. | Data Size | Deadline |
+| Parameter | Default | How to change | Effect |
 |---|---|---|---|
-| PERCEPTION | 5–10 GHz | 20–30 MB | +1.0 s |
-| PLANNING | 2–5 GHz | 5–10 MB | +1.5 s |
-| CONTROL | 1–2 GHz | 1–2 MB | +0.5 s |
+| Random seed | 42 | `make sumo SEED=123` | Different vehicle patterns |
+| Injection period | 5 s | `make sumo-rebuild PERIOD=3` | More vehicles (~33 at period=3) |
+| Simulation duration | 100 s | Edit `intersection.sumocfg` `<end>` | Longer/shorter trace |
+| Road speed limit | 13.89 m/s (50 km/h) | Edit `intersection.edg.xml` `speed=` | Faster/slower vehicles |
 
-### Key Parameters
+### MATLAB Simulation
 
-| Parameter | Value |
+| Parameter | Location | Default | Effect |
+|---|---|---|---|
+| `BANDWIDTH` | top of each script | 50 MB/s | Higher = easier offloading |
+| `TASK_ARRIVAL_RATE` | top of each script | 0.5 tasks/s | Higher = heavier load |
+| `N_TRIALS` | `run_trials.m` | 30 | More trials = tighter confidence |
+| Vehicle subset | `stress_test.m` `vehicle_counts` | [4,8,12,16,20] | Density sweep range |
+| Arrival sweep | `stress_test.m` `arrival_rates` | [0.25,0.5,1,1.5,2] | Load sweep range |
+
+### Channel Model (IEEE 802.11p)
+
+Tunable inside `src/channel_model.m`:
+
+| Parameter | Default | Effect |
+|---|---|---|
+| Path loss exponent `n` | 2.7 (urban) | Lower = better range (suburban: 2.0) |
+| Shadowing std `sigma` | 4 dB | Higher = more link variability |
+| Transmit power `P_tx` | 20 dBm | Higher = longer range |
+| Comm range cutoff | 300 m | Hard limit beyond which Q = 0 |
+| Offload threshold | Q ≥ 0.5 | Lower = more offload candidates |
+
+---
+
+## Output Reference
+
+### Baseline scripts
+
+| Script | Output |
 |---|---|
-| Communication range | 300 m |
-| Bandwidth | 50 MB/s |
-| Task arrival rate | 0.5 tasks/s per vehicle |
-| Vehicle speed | 10–15 m/s |
-| Processing power | 10–30 GHz (randomised) |
+| `intersection3.m` | Vehicle paths + per-step task counts, final summary printed |
+| `intersection-multiploicy.m` | Grouped bar chart: Completion vs Offloading Rate |
+
+### SUMO-upgraded scripts
+
+| Script / Command | Output |
+|---|---|
+| `intersectionmultipolicy_sumo` | Results table (5 rows) + bar chart |
+| `run_trials` | mean ± std table + error-bar subplots |
+| `stress_test` | 4-subplot figure: density sweep + load sweep |
+| `make visualise` | `trajectory_plot.png`, `heatmap.png`, `speed_profile.png` |
+| `make sumo-gui` | Live SUMO GUI — watch vehicles move in real time |
 
 ---
 
-## 📊 Output
+## Useful Make Commands
 
-### `intersectionmultipolicy.m`
-Produces a grouped bar chart comparing **Completion Rate** and **Offloading Rate** across all five strategies.
-
-### `intersection3.m`
-Produces two subplots:
-- Vehicle trajectory paths during the 100 s simulation
-- Per-timestep task counts (Completed, Offloaded, Local, Failed)
-
-And prints to the Command Window:
+```bash
+make                         # generate traces (default)
+make sumo                    # same as above, skip if already done
+make sumo-rebuild            # force regenerate network + routes + traces
+make sumo-rebuild SEED=123   # different seed, different vehicle pattern
+make sumo-rebuild PERIOD=3   # denser traffic (~33 vehicles)
+make sumo-gui                # open SUMO GUI for live playback
+make visualise               # generate PNG plots from traces
+make matlab-compare          # run intersectionmultipolicy_sumo in batch
+make matlab-trials           # run run_trials in batch
+make matlab-stress           # run stress_test in batch
+make clean                   # delete all generated SUMO files
+make help                    # print all targets
 ```
-=== Final Simulation Results ===
-Completed Tasks : X
-Offloaded Tasks : X
-Local Tasks     : X
-Failed Tasks    : X
-```
-
-### `intersection.m`
-Produces a 4-subplot figure with vehicle paths, cumulative task metrics, and smoothed efficiency rates over time.
 
 ---
 
-## 🔁 Reproducibility
+## Reproducibility
 
-Results vary slightly between runs because `rand()` is used without a fixed seed. To reproduce the exact paper results, add the following line at the top of any script before running:
+SUMO traces are deterministic given the same `--seed`. MATLAB randomness (task generation, vehicle capabilities) can be fixed with:
 
 ```matlab
-rng(42);
+rng(42);   % add at top of any script
 ```
+
+The `run_trials.m` script already sets `rng(trial * 100 + pi)` per trial, so its results are fully reproducible without extra steps.
 
 ---
 
-## 📬 Contact
+## Contact
 
 | Name | Email |
 |---|---|
@@ -189,6 +227,6 @@ rng(42);
 
 ---
 
-## 📜 License
+## License
 
 This project was developed for academic research purposes as part of a B.Tech final year project at KIET Group of Institutions, Ghaziabad (Session 2025-26), affiliated to Dr. A.P.J. Abdul Kalam Technical University, Lucknow.
