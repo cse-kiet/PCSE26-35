@@ -39,7 +39,7 @@ def load_csv(path):
 def plot_trajectories(vehicles):
     fig, ax = plt.subplots(figsize=(8, 8))
 
-    cmap   = cm.get_cmap("tab20", len(vehicles))
+    cmap   = matplotlib.colormaps.get_cmap("tab20").resampled(len(vehicles))
     colors = [cmap(i) for i in range(len(vehicles))]
 
     for i, (vid, d) in enumerate(sorted(vehicles.items())):
@@ -89,7 +89,7 @@ def plot_heatmap(vehicles):
 
 def plot_speed_profiles(vehicles):
     fig, ax = plt.subplots(figsize=(10, 5))
-    cmap = cm.get_cmap("tab20", len(vehicles))
+    cmap = matplotlib.colormaps.get_cmap("tab20").resampled(len(vehicles))
 
     for i, (vid, d) in enumerate(sorted(vehicles.items())):
         ax.plot(d["t"], d["speed"], lw=0.9, alpha=0.7,

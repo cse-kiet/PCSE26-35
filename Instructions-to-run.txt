@@ -93,26 +93,55 @@ Step 1: Generate SUMO mobility traces (run once from terminal)
   If you want a clean rebuild from scratch:
     make sumo-rebuild
 
-Step 2: Visualise the vehicle movement (optional but recommended)
------------------------------------------------------------------
+Step 2: Visual workflow — SUMO GUI + MATLAB figures together (recommended)
+--------------------------------------------------------------------------
 
-  Option A — Live GUI (watch vehicles drive through the intersection):
-    make sumo-gui
-    Press the green Play button inside the GUI.
-    Use the speed slider to slow down or fast-forward.
-    Click any vehicle to inspect its speed and position.
+  make sumo-gui
 
-  Option B — Static PNG plots (no display required):
-    make visualise
-    Saves three files to src/sumo/:
-      trajectory_plot.png   — path of every vehicle over 100 s
-      heatmap.png           — spatial density of vehicle presence
-      speed_profile.png     — speed over time per vehicle (shows traffic light stops)
+  This single command does everything:
+    - Generates fcd_traces.csv automatically if it is missing (no separate
+      "make sumo" needed before this step).
+    - Launches SUMO GUI in the background.
+        → Press the green Play button inside SUMO to start the simulation.
+        → Use the speed slider to slow down or fast-forward.
+        → Click any vehicle to inspect its speed and position.
+    - Immediately starts MATLAB (no desktop, just figure windows) which
+      produces four figures alongside the SUMO window:
 
-Step 3: Run MATLAB analysis
----------------------------
+        Figure 1 — Policy Comparison (single run)
+          Bar chart: completion rate + offloading rate for all five policies.
 
-  Open MATLAB, set working directory to project root, then:
+        Figure 2 — Statistical Comparison (10 trials with error bars)
+          Shows mean ± std across 10 independent trials.
+          Edit N_TRIALS at the top of visual_runner.m to change trial count
+          (set to 30 for paper-quality statistics).
+
+        Figure 3 — Density Sweep
+          Completion and offloading rate vs number of vehicles (4 → 20).
+
+        Figure 4 — Load Sweep
+          Completion and offloading rate vs task arrival rate (0.25 → 2.0 tasks/s).
+
+    - Close all four figure windows to exit MATLAB.
+      SUMO GUI stays open until you close it separately.
+
+Step 2b: Static PNG plots only (no display / headless server)
+-------------------------------------------------------------
+
+  make visualise
+  Saves three files to src/sumo/:
+    trajectory_plot.png   — path of every vehicle over 100 s
+    heatmap.png           — spatial density of vehicle presence
+    speed_profile.png     — speed over time per vehicle (shows traffic light stops)
+
+Step 3: Run MATLAB analysis in batch (no GUI, terminal output only)
+-------------------------------------------------------------------
+
+  make matlab-compare    — single run, prints table + saves bar chart
+  make matlab-trials     — 30 trials, prints mean ± std table
+  make matlab-stress     — density + load sweep, saves 4-subplot figures
+
+  Or from inside MATLAB (set working directory to project root first):
 
   >> intersectionmultipolicy_sumo
      Single run across all five policies.
@@ -126,11 +155,6 @@ Step 3: Run MATLAB analysis
   >> stress_test
      Sweeps vehicle count and task arrival rate across all five policies.
      Output: 4-subplot figures — density sweep + load sweep.
-
-  Or run in batch from terminal (no MATLAB GUI):
-    make matlab-compare
-    make matlab-trials
-    make matlab-stress
 
 ===============================================================================
 SECTION 3 — PARAMETERS YOU CAN CHANGE
@@ -267,17 +291,22 @@ SECTION 5 — TROUBLESHOOTING
 SECTION 6 — FULL PIPELINE REFERENCE
 ===============================================================================
 
-  # One-time setup
-  make sumo
+  # Visual workflow (recommended — does everything in one command)
+  make sumo-gui          # SUMO GUI + all 4 MATLAB figures together
+                         # (generates traces automatically if missing)
 
-  # Visualise traces
-  make sumo-gui          # live GUI
-  make visualise         # PNG plots
+  # Headless / batch workflow
+  make sumo              # generate traces (one-time setup)
+  make visualise         # static PNG plots (no display needed)
+  make matlab-compare    # single-run batch analysis
+  make matlab-trials     # 30-trial statistical evaluation
+  make matlab-stress     # density + load stress test
 
-  # MATLAB analysis (from MATLAB Command Window)
-  >> intersectionmultipolicy_sumo    # quick comparison
-  >> run_trials                      # statistical validation
-  >> stress_test                     # stress testing
+  # From MATLAB Command Window
+  >> visual_runner                   # all 4 figures, interactive
+  >> intersectionmultipolicy_sumo    # quick comparison only
+  >> run_trials                      # statistical validation only
+  >> stress_test                     # stress testing only
 
   # Housekeeping
   make clean             # remove all generated SUMO files

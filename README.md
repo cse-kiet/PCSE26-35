@@ -54,6 +54,7 @@ project/
 ├── intersectionmultipolicy_sumo.m        # SUMO: single-run five-policy comparison
 ├── run_trials.m                          # SUMO: 30-trial statistical evaluation
 ├── stress_test.m                         # SUMO: density + load sweep
+├── visual_runner.m                       # SUMO: unified visual workflow (all 4 figures)
 ├── src/
 │   ├── parse_fcd.m                       # Load SUMO CSV into vehicle structs
 │   ├── get_vehicle_state.m               # Query vehicle position at time t
@@ -110,17 +111,33 @@ cd('path/to/project')
 intersectionmultipolicy_sumo   % or the original intersection-multiploicy.m
 ```
 
-### SUMO-Upgraded (full pipeline)
+### SUMO-Upgraded — Visual Workflow (recommended)
+
+One command launches everything: SUMO GUI + all four MATLAB figure windows side by side.
+
+```bash
+make sumo-gui
+```
+
+- Traces are generated automatically if missing — no separate `make sumo` needed.
+- **SUMO GUI** opens in the background — hit the green Play button to watch 20 vehicles drive through the intersection.
+- **Four MATLAB figures** appear alongside:
+  - Figure 1 — bar chart: completion + offloading rates for all 5 policies
+  - Figure 2 — error bars across 10 trials
+  - Figure 3 — completion/offloading rate vs vehicle density (4→20 vehicles)
+  - Figure 4 — completion/offloading rate vs task arrival rate (0.25→2.0 tasks/s)
+- Close all figure windows to exit MATLAB. SUMO stays open until you close it separately.
+
+### SUMO-Upgraded — Batch / Headless
 
 ```bash
 # Step 1 — generate mobility traces
 make sumo
 
-# Step 2 — visualise vehicle movement (pick one)
-make sumo-gui          # live GUI playback (needs desktop)
-make visualise         # save PNG plots to src/sumo/
+# Step 2 — visualise vehicle movement (static PNGs, no display needed)
+make visualise         # saves trajectory_plot.png, heatmap.png, speed_profile.png
 
-# Step 3 — run MATLAB analysis
+# Step 3 — run MATLAB analysis (no GUI, prints results to terminal)
 make matlab-compare    # single run, policy table + bar chart
 make matlab-trials     # 30-trial mean ± std
 make matlab-stress     # density + load sweep plots
@@ -176,24 +193,25 @@ Tunable inside `src/channel_model.m`:
 
 | Script / Command | Output |
 |---|---|
+| `make sumo-gui` | **Visual workflow** — SUMO GUI + all 4 MATLAB figures together |
 | `intersectionmultipolicy_sumo` | Results table (5 rows) + bar chart |
 | `run_trials` | mean ± std table + error-bar subplots |
 | `stress_test` | 4-subplot figure: density sweep + load sweep |
+| `visual_runner` | All 4 figures in one run (used by `make sumo-gui`) |
 | `make visualise` | `trajectory_plot.png`, `heatmap.png`, `speed_profile.png` |
-| `make sumo-gui` | Live SUMO GUI — watch vehicles move in real time |
 
 ---
 
 ## Useful Make Commands
 
 ```bash
+make sumo-gui                # visual workflow: SUMO GUI + all MATLAB figures
 make                         # generate traces (default)
 make sumo                    # same as above, skip if already done
 make sumo-rebuild            # force regenerate network + routes + traces
 make sumo-rebuild SEED=123   # different seed, different vehicle pattern
 make sumo-rebuild PERIOD=3   # denser traffic (~33 vehicles)
-make sumo-gui                # open SUMO GUI for live playback
-make visualise               # generate PNG plots from traces
+make visualise               # generate PNG plots from traces (headless)
 make matlab-compare          # run intersectionmultipolicy_sumo in batch
 make matlab-trials           # run run_trials in batch
 make matlab-stress           # run stress_test in batch
@@ -202,6 +220,7 @@ make help                    # print all targets
 ```
 
 ---
+
 
 ## Reproducibility
 
@@ -214,6 +233,7 @@ rng(42);   % add at top of any script
 The `run_trials.m` script already sets `rng(trial * 100 + pi)` per trial, so its results are fully reproducible without extra steps.
 
 ---
+
 
 ## Contact
 
